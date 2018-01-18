@@ -10,7 +10,6 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    dugong_metrics:init(),
     init_http(),
     case dugong_sup:start_link() of
         {ok, Pid} ->
