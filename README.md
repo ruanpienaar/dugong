@@ -1,7 +1,7 @@
 dugong
 ===========
 
-A riak_core application
+A riak_core backend application for controlling and providing data storage for IoT/internet enabled electronic devices.
 
 Build
 -----
