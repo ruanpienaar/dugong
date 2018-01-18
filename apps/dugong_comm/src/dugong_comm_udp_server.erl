@@ -8,6 +8,7 @@
 
 -define(DB_SERVER_PORT, 4000).
 -define(DEVICE_SERVER_PORT, 4001).
+-define(PREFIX, {<<"dugong">>, <<"config">>}).
 
 %% Exported or proc_lib
 -export([
@@ -34,9 +35,15 @@ loop(Socket) ->
             io:format("[PIN VALUE CHANGED] Host : ~p Port ~p Pin ~p received:~p~n",
                 [Host, Port, Pin, Bin]),
             loop(Socket);
-        {udp, Socket, Host, Port, Bin = <<2, 0:8, 0:8>>} ->
-            % device connected
+        {udp, Socket, Host, Port, Bin = <<2, DeviceRef:16>>} ->
+            % device connecteds
             io:format("[DEVICE CONNECTED] Host : ~p Port ~p received:~p~n",[Host, Port, Bin]),
+            riak_core_metadata:put(?PREFIX, DeviceRef, {Host, Port}),
+            loop(Socket);
+        {udp, Socket, Host, Port, Bin = <<3, DeviceRef:16>>} ->
+            % device disconnected
+            io:format("[DEVICE CONNECTED] Host : ~p Port ~p received:~p~n",[Host, Port, Bin]),
+            riak_core_metadata:delete(?PREFIX, DeviceRef),
             loop(Socket);
         {udp, Socket, Host, Port, Bin} ->
             io:format("Host : ~p Port ~p received:~p~n",[Host, Port, Bin]),
